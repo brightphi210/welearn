@@ -16,4 +16,11 @@ urlpatterns = [
     
     path('student-profiles/', StudentProfileGet.as_view(), name='student'),
     path('student-profiles/update/<str:pk>/', StudentProfileUpdateDelete.as_view(), name='student'),
+
+    # ================ Forget Password ==================
+    path('password-forgot/', ForgotPasswordView.as_view(), name='forgot_password'),
+    path('password-reset/', ResetPasswordView.as_view(), name='reset_password'),
+
+    path('classes/', ClassListCreateAPIView.as_view(), name='class-list-create'),
+    path('class-bookings/', BookingListCreateAPIView.as_view(), name='booking-list-create'),
 ]

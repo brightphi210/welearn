@@ -5,6 +5,8 @@ from .models import User
 from rest_framework.response import Response
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
+
 
 
 
@@ -102,3 +104,63 @@ class StudentProfileUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
 
     def users_destroy(self, instance):
         return super().perform_destroy(instance)
+    
+
+
+class ClassListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+
+
+class BookingListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+# {
+#   "email" : "pbright103@gmail.com"
+# }
+
+# ================ FORGET PASSWORD ===================
+
+import random
+from django.core.mail import send_mail
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+        if user:
+            reset_code = random.randint(1000, 9999)
+            PasswordReset.objects.create(user=user, reset_code=reset_code)
+
+            subject = 'Confirm your email'
+            message = f'This is your code: {reset_code}'
+            from_email = 'smtp.gmail.com'
+            recipient_list = [email]
+            send_mail(subject, message, from_email, recipient_list)
+
+
+            return Response({"message": "Reset code sent successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        reset_code = request.data.get('reset_code')
+        password = request.data.get('password')
+        
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        password_reset = PasswordReset.objects.filter(user=user, reset_code=reset_code).first()
+        if not password_reset:
+            return Response({"error": "Invalid reset code."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(password)
+        user.save()
+        password_reset.delete()
+        return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)

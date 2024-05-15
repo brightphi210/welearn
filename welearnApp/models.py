@@ -84,10 +84,15 @@ class InstructorProfile(models.Model):
         ('Two', '3-5'),
         ('Three', '6 above'),
     )
-    skill = models.CharField(max_length=255, blank=True, null=True)
+    occupation = models.CharField(max_length=255, blank=True, null=True)
     years_of_experience = models.CharField(max_length=255, choices=EXPERIENCE, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', default='profile_pics/default.png', blank=True, null=True)
+    is_verified = models.BooleanField(default=False)
+    gender = models.CharField(max_length=255, blank=True, null=True)
+    dob = models.CharField(max_length=255, blank=True, null=True)
+    bio_data = models.TextField(max_length=255, blank=True, null=True)
+
 
     def __str__(self):
         return self.user.name
@@ -102,3 +107,40 @@ class StudentProfile(models.Model):
 
     def __str__(self):
         return self.user.name
+    
+
+
+class Class(models.Model):
+    instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE)
+    class_name = models.CharField(max_length=100)
+    DURATION = (
+        ('ONE', 'TWO WEEKS'),
+        ('TWO', 'ONE MONTHS'),
+        ('THREE', 'TWO MONTHS'),
+        ('FOUR', 'THREE MONTHS'),
+        ('FIVE', 'FOUR MONTHS'),
+        ('SIX', 'FIVE MONTHS'),
+        ('SEVEN', 'SIX MONTHS'),
+        ('EIGHT', 'ONE YEAR ABOVE'),
+    )
+    durtion = models.CharField(max_length=255, blank=True, null=True, choices=DURATION)
+
+    def __str__(self):
+        self.name
+
+
+class Booking(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    class_booked = models.ForeignKey(Class, on_delete=models.CASCADE)
+    day = models.DateField()
+    time = models.TimeField()
+
+
+# ==================== PASSWORD FORGET AND RESET =====================
+
+class PasswordReset(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    reset_code = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+

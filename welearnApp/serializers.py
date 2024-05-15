@@ -9,6 +9,8 @@ def generate_otp():
     otp = ''.join([str(random.randint(0, 9)) for _ in range(4)])
     return otp
 
+
+# ================ CREATING OF USER ===================
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
@@ -23,6 +25,7 @@ class UserSerializer(ModelSerializer):
         return user
     
 
+# ==================== VERIFY USER SERIALIZER =======================
 class VerifyUserSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     otp = serializers.CharField(required=True)
@@ -45,13 +48,38 @@ class VerifyUserSerializer(serializers.Serializer):
         return user
     
 
+
+# ================ INSTRUCTIOR ======================
 class InstructorSerializer(ModelSerializer):
     class Meta:
         model = InstructorProfile
         fields = '__all__'
+        depth = 1
 
 
+
+# ===================== STUDENT ========================
 class StudentSerializer(ModelSerializer):
     class Meta:
         model = StudentProfile
+        fields = '__all__'
+
+
+
+class ClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = '__all__'
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = '__all__'
+    
+# ================= FORGET PASSWORD AND RESET PASSWORD ============
+
+class PasswordResetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PasswordReset
         fields = '__all__'
