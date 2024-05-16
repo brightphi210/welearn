@@ -89,6 +89,8 @@ class InstructorProfile(models.Model):
     location = models.CharField(max_length=255, blank=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', default='profile_pics/default.png', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
+    is_hired = models.BooleanField(default=False)
+    number_of_trained_students = models.IntegerField(blank=True, null=True)
     gender = models.CharField(max_length=255, blank=True, null=True)
     dob = models.CharField(max_length=255, blank=True, null=True)
     bio_data = models.TextField(max_length=255, blank=True, null=True)
@@ -96,6 +98,18 @@ class InstructorProfile(models.Model):
 
     def __str__(self):
         return self.user.name
+    
+
+
+class Review(models.Model):
+    instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE, related_name='reviews')
+    student_name = models.CharField(max_length=100)
+    comment = models.TextField()
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"This is review for this instructor{self.instructor.user.name}"
 
 
 
@@ -124,16 +138,20 @@ class Class(models.Model):
         ('EIGHT', 'ONE YEAR ABOVE'),
     )
     durtion = models.CharField(max_length=255, blank=True, null=True, choices=DURATION)
-
+    price = models.CharField(max_length=255, blank=True, null=True)
     def __str__(self):
-        self.name
+        return self.class_name
 
 
 class Booking(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     class_booked = models.ForeignKey(Class, on_delete=models.CASCADE)
+    location = models.CharField(max_length=225, null=True, blank=True)
     day = models.DateField()
     time = models.TimeField()
+
+    def __str__(self):
+        return self.class_booked.class_name
 
 
 # ==================== PASSWORD FORGET AND RESET =====================

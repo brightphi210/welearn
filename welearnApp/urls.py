@@ -22,5 +22,12 @@ urlpatterns = [
     path('password-reset/', ResetPasswordView.as_view(), name='reset_password'),
 
     path('classes/', ClassListCreateAPIView.as_view(), name='class-list-create'),
+    path('classes/update/<str:pk>/', ClassUpdateDelete.as_view(), name='class-update-delete'),
+
+
     path('class-bookings/', BookingListCreateAPIView.as_view(), name='booking-list-create'),
+    path('class-bookings/update/<str:pk>/', BookingUpdateDelete.as_view(), name='booking-update-delete'),
+
+
+    path('reviews/', ReviewListCreateAPIView.as_view(), name='reviews'),
 ]

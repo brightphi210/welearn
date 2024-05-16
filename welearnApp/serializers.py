@@ -15,6 +15,8 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'password', 'user_type']
+        depth = 1
+        
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -63,6 +65,7 @@ class StudentSerializer(ModelSerializer):
     class Meta:
         model = StudentProfile
         fields = '__all__'
+        depth = 1
 
 
 
@@ -70,16 +73,24 @@ class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         fields = '__all__'
+        depth = 1
 
 
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = '__all__'
+        depth = 1
     
 # ================= FORGET PASSWORD AND RESET PASSWORD ============
 
 class PasswordResetSerializer(serializers.ModelSerializer):
     class Meta:
         model = PasswordReset
+        fields = '__all__'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
         fields = '__all__'

@@ -107,14 +107,90 @@ class StudentProfileUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     
 
 
+# ============== CREATING CLASS =======================
 class ClassListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
 
 
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        # Check if the creation was successful
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({'message': 'Class created successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            # Creation failed, customize the error message
+            error_message = {'message': 'Class creation failed😒😒'}
+            response.data = error_message
+            return response
+
+
+# =============GET UPDATE, DELETE INSTRUCTORS PROFILE ===========
+class ClassUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+    lookup_field = 'pk'
+
+    def users_update(self, serializer):
+        instance = serializer.save()
+
+    def users_destroy(self, instance):
+        return super().perform_destroy(instance)
+
+
+# =============== BOOKING CLASS =====================
 class BookingListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        # Check if the creation was successful
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({'message': 'Bookings successful'}, status=status.HTTP_201_CREATED)
+        else:
+            # Creation failed, customize the error message
+            error_message = {'message': 'Booking creation failed😒😒'}
+            response.data = error_message
+            return response
+
+
+# =============GET UPDATE, DELETE INSTRUCTORS PROFILE ===========
+class BookingUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    lookup_field = 'pk'
+
+    def users_update(self, serializer):
+        instance = serializer.save()
+
+    def users_destroy(self, instance):
+        return super().perform_destroy(instance)
+
+class ReviewListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        # Check if the creation was successful
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({'message': 'Reviewed successful'}, status=status.HTTP_201_CREATED)
+        else:
+            # Creation failed, customize the error message
+            error_message = {'message': 'Review creation failed😒😒'}
+            response.data = error_message
+            return response
 
 # {
 #   "email" : "pbright103@gmail.com"
