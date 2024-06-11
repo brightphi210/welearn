@@ -243,24 +243,26 @@ class ResetPasswordView(APIView):
 
 
 
-from rest_framework.views import APIView
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import check_password
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+    # permission_classes = [IsAuthenticated]
 
-User = get_user_model()      
+    def get_object(self, queryset=None):
+        return self.request.user
 
-class ChangePasswordView(APIView):
-    # permission_classes = (IsAuthenticated)
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
 
-    def post(self, request, *args, **kwargs):
-        serializer = ChangePasswordSerializer(data=request.data)
         if serializer.is_valid():
-            user = request.user
-            if not check_password(serializer.validated_data['old_password'], user.password):
+            old_password = serializer.data.get("old_password")
+            new_password = serializer.data.get("new_password")
+
+            if not self.object.check_password(old_password):
                 return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
-            return Response({"detail": "Password updated successfully."}, status=status.HTTP_200_OK)
+
+            self.object.set_password(new_password)
+            self.object.save()
+            return Response({"detail": "Password changed successfully."})
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-22503168902

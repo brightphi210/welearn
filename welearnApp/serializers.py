@@ -122,12 +122,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 
+# change Password
+from rest_framework import serializers
+
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
-
-    def validate_new_password(self, value):
-        # Add any custom validation for the new password here
-        if len(value) < 8:
-            raise serializers.ValidationError("Password should be at least 8 characters long.")
-        return value
+    confirm_new_password = serializers.CharField(required=True)
