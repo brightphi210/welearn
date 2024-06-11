@@ -1,6 +1,7 @@
 from .models import *
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 import random
@@ -10,8 +11,31 @@ def generate_otp():
     return otp
 
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['name'] = user.name
+        token['email'] = user.email
+        token['user_type'] = user.user_type
+
+        # Add profile_id
+        if user.user_type == 'Instructor':
+            profile = InstructorProfile.objects.get(user=user)
+            token['profile_id'] = profile.id
+        else:
+            profile = StudentProfile.objects.get(user=user)
+            token['profile_id'] = profile.id
+
+        return token    
+
+
 # ================ CREATING OF USER ===================
 class UserSerializer(ModelSerializer):
+    
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'password', 'user_type']
@@ -53,6 +77,7 @@ class VerifyUserSerializer(serializers.Serializer):
 
 # ================ INSTRUCTIOR ======================
 class InstructorSerializer(ModelSerializer):
+
     class Meta:
         model = InstructorProfile
         fields = '__all__'
@@ -94,3 +119,15 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'  
+
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        # Add any custom validation for the new password here
+        if len(value) < 8:
+            raise serializers.ValidationError("Password should be at least 8 characters long.")
+        return value

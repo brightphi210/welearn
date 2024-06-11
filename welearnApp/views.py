@@ -65,7 +65,7 @@ class ActivateAccountView(APIView):
 # ============== GET INSTRUCTORS PROFILE =================
 
 class InstructorProfileGet(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = InstructorProfile.objects.all()
     serializer_class = InstructorSerializer
 
@@ -74,7 +74,7 @@ class InstructorProfileGet(generics.ListAPIView):
 
 # =============GET UPDATE, DELETE INSTRUCTORS PROFILE ===========
 class InstructorProfileUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = InstructorProfile.objects.all()
     serializer_class = InstructorSerializer
     lookup_field = 'pk'
@@ -88,13 +88,13 @@ class InstructorProfileUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
 
 # ============== GET STUDENTS PROFILE =================
 class StudentProfileGet(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = StudentProfile.objects.all()
     serializer_class = StudentSerializer
 
 # =============GET UPDATE, DELETE INSTRUCTORS PROFILE ===========
 class StudentProfileUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = StudentProfile.objects.all()
     serializer_class = StudentSerializer
     lookup_field = 'pk'
@@ -240,3 +240,27 @@ class ResetPasswordView(APIView):
         user.save()
         password_reset.delete()
         return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
+
+
+
+from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
+
+User = get_user_model()      
+
+class ChangePasswordView(APIView):
+    # permission_classes = (IsAuthenticated)
+
+    def post(self, request, *args, **kwargs):
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            if not check_password(serializer.validated_data['old_password'], user.password):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({"detail": "Password updated successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+22503168902

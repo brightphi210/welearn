@@ -118,7 +118,7 @@ class StudentProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     location = models.CharField(max_length=255, blank=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', default='profile_pics/default.png', blank=True, null=True)
-
+    gender = models.CharField(max_length=255, blank=True, null=True)
     def __str__(self):
         return self.user.name
     

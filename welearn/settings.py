@@ -37,7 +37,7 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'welearnApp.User'
 
-ORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 
@@ -90,6 +90,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+
+     'DATETIME_FORMAT': "%Y-%m-%d",
+    'DATE_FORMAT': "%Y-%m-%d",
 }
 
 
