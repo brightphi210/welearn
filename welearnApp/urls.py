@@ -5,7 +5,7 @@ urlpatterns = [
 
     # ================= USER CREATE ========================
     path('user/',UserGetCreate.as_view(), name='user'),
-
+    path('user/update/<str:pk>/',UserGetUpdateDelete.as_view(), name='user'),
 
     # ================= ACCOUNT OTP ========================
     path('account-otp/', ActivateAccountView.as_view(), name='otp'),

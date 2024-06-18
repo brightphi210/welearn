@@ -75,28 +75,22 @@ class VerifyUserSerializer(serializers.Serializer):
     
 
 
-# ================ INSTRUCTIOR ======================
-class InstructorSerializer(ModelSerializer):
-
-    class Meta:
-        model = InstructorProfile
-        fields = '__all__'
-        depth = 1
-
-
-
-# ===================== STUDENT ========================
-class StudentSerializer(ModelSerializer):
-    class Meta:
-        model = StudentProfile
-        fields = '__all__'
-        depth = 1
-
-
-
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
+        fields = '__all__'
+        depth = 1
+
+
+
+# ================ INSTRUCTIOR ======================
+class InstructorSerializer(ModelSerializer):
+    
+    classes = ClassSerializer(many=True)
+    
+    
+    class Meta:
+        model = InstructorProfile
         fields = '__all__'
         depth = 1
 
@@ -105,7 +99,20 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = '__all__'
+        depth = 2
+
+
+# ===================== STUDENT ========================
+class StudentSerializer(ModelSerializer):
+    
+    hiredInstructors = BookingSerializer(many=True)
+    
+    class Meta:
+        model = StudentProfile
+        fields = '__all__'
         depth = 1
+
+
     
 # ================= FORGET PASSWORD AND RESET PASSWORD ============
 
@@ -118,10 +125,10 @@ class PasswordResetSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = '__all__'  
-
-
-
+        fields = '__all__'
+        
+        
+        
 # change Password
 from rest_framework import serializers
 
@@ -129,3 +136,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
     confirm_new_password = serializers.CharField(required=True)
+    
+    
+    
+    

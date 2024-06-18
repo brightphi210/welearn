@@ -144,11 +144,26 @@ class Class(models.Model):
 
 
 class Booking(models.Model):
-    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    
+    DATEONE = (
+        ('ONE', 'MONDAY'),
+        ('TWO', 'TUESDAY'),
+        ('THREE', 'WEDNESDAY'),
+        ('FOUR', 'THURSDAY'),
+        ('FIVE', 'FRIDAY'),
+        ('SIX', 'SATURDAY'),
+    )
+    
+    student = models.ForeignKey(StudentProfile, related_name='hiredInstructors', on_delete=models.CASCADE)
     class_booked = models.ForeignKey(Class, on_delete=models.CASCADE)
     location = models.CharField(max_length=225, null=True, blank=True)
-    day = models.DateField()
-    time = models.TimeField()
+    dayone = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
+    daytwo = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
+
+    daythree = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
+    timeone = models.TimeField(blank=True, null=True,)
+    timetwo = models.TimeField(blank=True, null=True,)
+    timethree = models.TimeField(blank=True, null=True,)
 
     def __str__(self):
         return self.class_booked.class_name

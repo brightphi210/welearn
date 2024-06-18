@@ -62,6 +62,33 @@ class ActivateAccountView(APIView):
         
 
 
+
+class UserGetUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'pk'
+
+
+
+
+# ============ ACCOUNT VERIFICATION VIA OTP =============
+class ActivateAccountView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        otp = request.data.get('otp')
+
+        try:
+            user = User.objects.get(email=email)
+            if user.otp == otp and not user.is_active:
+                user.is_active = True
+                user.save()
+                return Response({'message': 'Account activated successfully!'})
+            else:
+                return Response({'message': 'Invalid OTP or account already activated'}, status=400)
+        except User.DoesNotExist:
+            return Response({'message': 'User with this email not found'}, status=404)
+        
+
 # ============== GET INSTRUCTORS PROFILE =================
 
 class InstructorProfileGet(generics.ListAPIView):
