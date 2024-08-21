@@ -129,14 +129,14 @@ class Class(models.Model):
     instructor = models.ForeignKey(InstructorProfile, related_name='classes', on_delete=models.CASCADE)
     class_name = models.CharField(max_length=100)
     DURATION = (
-        ('ONE', 'TWO WEEKS'),
-        ('TWO', 'ONE MONTHS'),
-        ('THREE', 'TWO MONTHS'),
-        ('FOUR', 'THREE MONTHS'),
-        ('FIVE', 'FOUR MONTHS'),
-        ('SIX', 'FIVE MONTHS'),
-        ('SEVEN', 'SIX MONTHS'),
-        ('EIGHT', 'ONE YEAR ABOVE'),
+        ('TWO WEEKS', 'TWO WEEKS'),
+        ('ONE MONTHS', 'ONE MONTHS'),
+        ('TWO MONTHS', 'TWO MONTHS'),
+        ('THREE MONTHS', 'THREE MONTHS'),
+        ('FOUR MONTHS', 'FOUR MONTHS'),
+        ('FIVE MONTHS', 'FIVE MONTHS'),
+        ('SIX MONTHS', 'SIX MONTHS'),
+        ('ONE YEAR ABOVE', 'ONE YEAR ABOVE'),
     )
     durtion = models.CharField(max_length=255, blank=True, null=True, choices=DURATION)
     price = models.CharField(max_length=255, blank=True, null=True)
@@ -147,12 +147,12 @@ class Class(models.Model):
 class Booking(models.Model):
     
     DATEONE = (
-        ('ONE', 'MONDAY'),
-        ('TWO', 'TUESDAY'),
-        ('THREE', 'WEDNESDAY'),
-        ('FOUR', 'THURSDAY'),
-        ('FIVE', 'FRIDAY'),
-        ('SIX', 'SATURDAY'),
+        ('MONDAY', 'MONDAY'),
+        ('TUESDAY', 'TUESDAY'),
+        ('WEDNESDAY', 'WEDNESDAY'),
+        ('THURSDAY', 'THURSDAY'),
+        ('FRIDAY', 'FRIDAY'),
+        ('SATURDAY', 'SATURDAY'),
     )
     
     student = models.ForeignKey(StudentProfile, related_name='hiredInstructors', on_delete=models.CASCADE)
