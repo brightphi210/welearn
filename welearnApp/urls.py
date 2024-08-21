@@ -33,4 +33,7 @@ urlpatterns = [
 
     # ============= CHANGE PASSWORD ====================
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
+
+    path('instructor-remarks/', InstructorRemarkCreateView.as_view(), name='remark-list-create'),
+    path('student-remarks/', StudentRemarkCreateView.as_view(), name='remark-list-create'),
 ]

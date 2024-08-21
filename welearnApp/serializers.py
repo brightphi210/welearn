@@ -7,7 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import random
 
 def generate_otp():
-    otp = ''.join([str(random.randint(0, 9)) for _ in range(4)])
+    otp = ''.join([str(random.randint(0, 30)) for _ in range(4)])
     return otp
 
 
@@ -20,16 +20,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         token['name'] = user.name
         token['email'] = user.email
-        token['user_type'] = user.user_type
-
-        # Add profile_id
-        if user.user_type == 'Instructor':
-            profile = InstructorProfile.objects.get(user=user)
-            token['profile_id'] = profile.id
-        else:
-            profile = StudentProfile.objects.get(user=user)
-            token['profile_id'] = profile.id
-
+        profile = InstructorProfile.objects.get(user=user)
+        token['profile_id'] = profile.id
         return token    
 
 
@@ -83,16 +75,21 @@ class ClassSerializer(serializers.ModelSerializer):
 
 
 
-# ================ INSTRUCTIOR ======================
-class InstructorSerializer(ModelSerializer):
-    
-    classes = ClassSerializer(many=True)
-    
-    
+
+# Remarks
+class InstructorRemarkSerializer(serializers.ModelSerializer):
     class Meta:
-        model = InstructorProfile
+        model = InstructorRemark
         fields = '__all__'
-        depth = 1
+        # depth = 1
+
+
+class StudentRemarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentRemark
+        fields = '__all__'
+        # depth = 1
+
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -101,11 +98,23 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 2
 
+# ================ INSTRUCTIOR ======================
+class InstructorSerializer(ModelSerializer):
+    
+    classes = ClassSerializer(many=True)
+    instructorRemark = InstructorRemarkSerializer(many=True)
+    
+    
+    class Meta:
+        model = InstructorProfile
+        fields = '__all__'
+        depth = 1
 
 # ===================== STUDENT ========================
 class StudentSerializer(ModelSerializer):
     
     hiredInstructors = BookingSerializer(many=True)
+    studentRemark = StudentRemarkSerializer(many=True)
     
     class Meta:
         model = StudentProfile
@@ -136,7 +145,4 @@ class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
     confirm_new_password = serializers.CharField(required=True)
-    
-    
-    
     

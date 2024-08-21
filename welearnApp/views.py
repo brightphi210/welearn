@@ -293,3 +293,39 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response({"detail": "Password changed successfully."})
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class InstructorRemarkCreateView(generics.ListCreateAPIView):
+    serializer_class = InstructorRemarkSerializer
+    queryset = InstructorRemark.objects.all()
+    # permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        # Check if the creation was successful
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({'message': 'Remark successful'}, status=status.HTTP_201_CREATED)
+        else:
+            # Creation failed, customize the error message
+            error_message = {'message': 'Remark creation failed😒😒'}
+            response.data = error_message
+            return response
+
+
+class StudentRemarkCreateView(generics.ListCreateAPIView):
+    serializer_class = StudentRemarkSerializer
+    queryset = StudentRemark.objects.all()
+    # permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        # Check if the creation was successful
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({'message': 'Remark successful'}, status=status.HTTP_201_CREATED)
+        else:
+            # Creation failed, customize the error message
+            error_message = {'message': 'Remark creation failed😒😒'}
+            response.data = error_message
+            return response

@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import UserManager, AbstractBaseUser, PermissionsMixin
 
+
+
 from django.conf import settings
 # Create your models here.
 
@@ -11,7 +13,6 @@ class CustomUserManager(UserManager):
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
-
         return user
 
     def create_user(self, email=None, password=None, **extra_fields):
@@ -125,7 +126,7 @@ class StudentProfile(models.Model):
 
 
 class Class(models.Model):
-    instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE)
+    instructor = models.ForeignKey(InstructorProfile, related_name='classes', on_delete=models.CASCADE)
     class_name = models.CharField(max_length=100)
     DURATION = (
         ('ONE', 'TWO WEEKS'),
@@ -159,7 +160,6 @@ class Booking(models.Model):
     location = models.CharField(max_length=225, null=True, blank=True)
     dayone = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
     daytwo = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
-
     daythree = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
     timeone = models.TimeField(blank=True, null=True,)
     timetwo = models.TimeField(blank=True, null=True,)
@@ -175,5 +175,29 @@ class PasswordReset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reset_code = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class InstructorRemark(models.Model):
+    instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE, related_name='instructorRemark', blank=True, null=True)
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, blank=True, null=True)
+    content = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    def __str__(self):
+        return f'Remark from {self.instructor.user.email} to {self.student.user.email}'
+    
+
+
+class StudentRemark(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='studentRemark', blank=True, null=True)
+    instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE, blank=True, null=True)
+    content = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    def __str__(self):
+        return f'Remark from {self.student.user.email} to {self.instructor.user.email}'
+    
+
+
 
 
