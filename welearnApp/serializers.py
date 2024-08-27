@@ -20,8 +20,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         token['name'] = user.name
         token['email'] = user.email
-        profile = InstructorProfile.objects.get(user=user)
-        token['profile_id'] = profile.id
+
+        try:
+            profile = InstructorProfile.objects.get(user=user)
+            token['profile_id'] = profile.id
+        except InstructorProfile.DoesNotExist:
+            token['profile_id'] = None  # or handle this case as needed
+
+
         return token    
 
 
