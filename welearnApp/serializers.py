@@ -71,7 +71,7 @@ class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         fields = '__all__'
-        depth = 1
+        # depth = 1
 
 
 
@@ -96,13 +96,16 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = '__all__'
-        depth = 2
+        # depth = 2
+    
+    
 
 # ================ INSTRUCTIOR ======================
 class InstructorSerializer(ModelSerializer):
     
     classes = ClassSerializer(many=True)
     instructorRemark = InstructorRemarkSerializer(many=True)
+    allBookings = BookingSerializer(many=True)
     
     
     class Meta:
@@ -112,6 +115,7 @@ class InstructorSerializer(ModelSerializer):
 
 # ===================== STUDENT ========================
 class StudentSerializer(ModelSerializer):
+
     
     hiredInstructors = BookingSerializer(many=True)
     studentRemark = StudentRemarkSerializer(many=True)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import UserManager, AbstractBaseUser, PermissionsMixin
-
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 from django.conf import settings
@@ -146,7 +147,7 @@ class Class(models.Model):
 
 class Booking(models.Model):
     
-    DATEONE = (
+    DAYS = (
         ('MONDAY', 'MONDAY'),
         ('TUESDAY', 'TUESDAY'),
         ('WEDNESDAY', 'WEDNESDAY'),
@@ -154,20 +155,53 @@ class Booking(models.Model):
         ('FRIDAY', 'FRIDAY'),
         ('SATURDAY', 'SATURDAY'),
     )
+
+
+    TIMES = (
+        ('10am-12pm', '10am-12pm'),
+        ('12pm-2pm', '12pm-2pm'),
+        ('2pm-4pm', '2pm-4pm'),
+        ('4pm-6pm', '4pm-6pm'),
+    )
+
     
     student = models.ForeignKey(StudentProfile, related_name='hiredInstructors', on_delete=models.CASCADE)
+    instructor = models.ForeignKey(InstructorProfile, related_name='allBookings', on_delete=models.CASCADE, null=True, blank=True)
     class_booked = models.ForeignKey(Class, on_delete=models.CASCADE)
     location = models.CharField(max_length=225, null=True, blank=True)
-    dayone = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
-    daytwo = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
-    daythree = models.CharField(max_length=255, blank=True, null=True, choices=DATEONE)
-    timeone = models.TimeField(blank=True, null=True,)
-    timetwo = models.TimeField(blank=True, null=True,)
-    timethree = models.TimeField(blank=True, null=True,)
+    dayone = models.CharField(max_length=255, blank=True, null=True, choices=DAYS)
+    daytwo = models.CharField(max_length=255, blank=True, null=True, choices=DAYS)
+    daythree = models.CharField(max_length=255, blank=True, null=True, choices=DAYS)
+    timeone = models.CharField(max_length=255, blank=True, null=True, choices=TIMES)
+    timetwo = models.CharField(max_length=255, blank=True, null=True, choices=TIMES)
+    timethree = models.CharField(max_length=255, blank=True, null=True, choices=TIMES)
+
+
+    def clean(self):
+        # Check if an instructor has more than three classes on the same day
+        days_times = {
+            'dayone': 'timeone',
+            'daytwo': 'timetwo',
+            'daythree': 'timethree'
+        }
+        for day_field, time_field in days_times.items():
+            day = getattr(self, day_field)
+            time = getattr(self, time_field)
+            if day and time:
+                # Check for maximum classes per day
+                if Booking.objects.filter(instructor=self.instructor, **{day_field: day, time_field: time}).count() >= 3:
+                    raise ValidationError(_(f'The instructor already has the maximum number of classes at {time} on {day}'))
+                # Check for overlapping time slots
+                if Booking.objects.filter(instructor=self.instructor, **{day_field: day, **{time_field: time}}).exists():
+                    raise ValidationError(_(f'The time slot {time} on {day} is already booked for this instructor'))
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.class_booked.class_name
-
 
 # ==================== PASSWORD FORGET AND RESET =====================
 

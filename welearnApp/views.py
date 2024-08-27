@@ -136,7 +136,7 @@ class StudentProfileUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
 
 # ============== CREATING CLASS =======================
 class ClassListCreateAPIView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
 
@@ -170,22 +170,22 @@ class ClassUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
 
 # =============== BOOKING CLASS =====================
 class BookingListCreateAPIView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
 
 
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        
-        # Check if the creation was successful
-        if response.status_code == status.HTTP_201_CREATED:
-            return Response({'message': 'Bookings successful'}, status=status.HTTP_201_CREATED)
-        else:
-            # Creation failed, customize the error message
-            error_message = {'message': 'Booking creation failed😒😒'}
-            response.data = error_message
-            return response
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response({'message': 'Booking successful'}, status=status.HTTP_201_CREATED, headers=headers)
+        except ValidationError as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': 'Booking creation failed'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # =============GET UPDATE, DELETE INSTRUCTORS PROFILE ===========
