@@ -20,7 +20,6 @@ class UserGetCreate(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
 
-
         # Check if a user with the given email already exists
         email = request.data.get('email', None)
         if email and User.objects.filter(email=email).exists():
@@ -53,6 +52,7 @@ class ActivateAccountView(APIView):
             user = User.objects.get(email=email)
             if user.otp == otp and not user.is_active:
                 user.is_active = True
+                user.otp = ''  # Clear OTP after successful activation
                 user.save()
                 return Response({'message': 'Account activated successfully!'})
             else:

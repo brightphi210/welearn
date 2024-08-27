@@ -7,7 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import random
 
 def generate_otp():
-    otp = ''.join([str(random.randint(0, 30)) for _ in range(4)])
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])  # 6-digit OTP
     return otp
 
 
@@ -54,16 +54,10 @@ class VerifyUserSerializer(serializers.Serializer):
         user = User.objects.filter(email=email).first()
         if not user:
             raise serializers.ValidationError('Invalid email address')
-        if user.is_active or not user.otp == otp:
+        if user.is_active or user.otp != otp:
             raise serializers.ValidationError('Invalid OTP code')
         return attrs
 
-    def update(self, instance, validated_data):
-        user = User.objects.get(email=validated_data['email'])
-        user.is_active = True
-        user.otp = ''
-        user.save()
-        return user
     
 
 
