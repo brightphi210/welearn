@@ -163,7 +163,6 @@ class Booking(models.Model):
         ('2pm-4pm', '2pm-4pm'),
         ('4pm-6pm', '4pm-6pm'),
     )
-
     
     student = models.ForeignKey(StudentProfile, related_name='hiredInstructors', on_delete=models.CASCADE)
     instructor = models.ForeignKey(InstructorProfile, related_name='allBookings', on_delete=models.CASCADE, null=True, blank=True)
