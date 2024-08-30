@@ -20,15 +20,22 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         token['name'] = user.name
         token['email'] = user.email
+        token['user_type'] = user.user_type
 
+        # Try to get InstructorProfile first
         try:
             profile = InstructorProfile.objects.get(user=user)
             token['profile_id'] = profile.id
         except InstructorProfile.DoesNotExist:
-            token['profile_id'] = None  # or handle this case as needed
+            # If InstructorProfile does not exist, try StudentProfile
+            try:
+                profile = StudentProfile.objects.get(user=user)
+                token['profile_id'] = profile.id
+            except StudentProfile.DoesNotExist:
+                # Handle the case where neither profile exists
+                token['profile_id'] = None
 
-
-        return token    
+        return token
 
 
 # ================ CREATING OF USER ===================
@@ -66,13 +73,11 @@ class VerifyUserSerializer(serializers.Serializer):
 
     
 
-
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         fields = '__all__'
         # depth = 1
-
 
 
 
@@ -84,6 +89,7 @@ class InstructorRemarkSerializer(serializers.ModelSerializer):
         # depth = 1
 
 
+
 class StudentRemarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentRemark
@@ -91,13 +97,27 @@ class StudentRemarkSerializer(serializers.ModelSerializer):
         # depth = 1
 
 
+class PaymentSuccessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentSuccess
+        fields = '__all__'
 
-class BookingSerializer(serializers.ModelSerializer):
+
+
+class BookingSerializerPost(serializers.ModelSerializer):
+    isPayed = PaymentSuccessSerializer(required=False, many=False)
     class Meta:
         model = Booking
         fields = '__all__'
-        # depth = 2
-    
+        # depth = 4
+        
+
+class BookingSerializerGet(serializers.ModelSerializer):
+    isPayed = PaymentSuccessSerializer(required=False, many=False)
+    class Meta:
+        model = Booking
+        fields = '__all__'
+        depth = 4
     
 
 # ================ INSTRUCTIOR ======================
@@ -105,7 +125,7 @@ class InstructorSerializer(ModelSerializer):
     
     classes = ClassSerializer(many=True)
     instructorRemark = InstructorRemarkSerializer(many=True)
-    allBookings = BookingSerializer(many=True)
+    allBookings = BookingSerializerGet(many=True)
     
     
     class Meta:
@@ -117,7 +137,7 @@ class InstructorSerializer(ModelSerializer):
 class StudentSerializer(ModelSerializer):
 
     
-    hiredInstructors = BookingSerializer(many=True)
+    hiredInstructors = BookingSerializerGet(many=True)
     studentRemark = StudentRemarkSerializer(many=True)
     
     class Meta:

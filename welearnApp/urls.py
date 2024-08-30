@@ -36,4 +36,8 @@ urlpatterns = [
 
     path('instructor-remarks/', InstructorRemarkCreateView.as_view(), name='remark-list-create'),
     path('student-remarks/', StudentRemarkCreateView.as_view(), name='remark-list-create'),
+    path('delete-account/<str:pk>/', DeleteAccountView.as_view(), name='delete-account'),
+
+
+    path('payment/', PaymentSuccessView.as_view(), name='payment'),
 ]

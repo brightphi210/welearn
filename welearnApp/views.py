@@ -69,26 +69,6 @@ class UserGetUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
 
 
-
-
-# ============ ACCOUNT VERIFICATION VIA OTP =============
-class ActivateAccountView(APIView):
-    def post(self, request):
-        email = request.data.get('email')
-        otp = request.data.get('otp')
-
-        try:
-            user = User.objects.get(email=email)
-            if user.otp == otp and not user.is_active:
-                user.is_active = True
-                user.save()
-                return Response({'message': 'Account activated successfully!'})
-            else:
-                return Response({'message': 'Invalid OTP or account already activated'}, status=400)
-        except User.DoesNotExist:
-            return Response({'message': 'User with this email not found'}, status=404)
-        
-
 # ============== GET INSTRUCTORS PROFILE =================
 
 class InstructorProfileGet(generics.ListAPIView):
@@ -172,8 +152,16 @@ class ClassUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
 class BookingListCreateAPIView(generics.ListCreateAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
 
+    # Define both serializers
+    serializer_class_get = BookingSerializerGet
+    serializer_class_post = BookingSerializerPost
+
+    # Override get_serializer_class to choose the serializer based on the request method
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return self.serializer_class_post
+        return self.serializer_class_get
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -188,11 +176,12 @@ class BookingListCreateAPIView(generics.ListCreateAPIView):
             return Response({'message': 'Booking creation failed'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 # =============GET UPDATE, DELETE INSTRUCTORS PROFILE ===========
 class BookingUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
+    serializer_class = BookingSerializerGet
     lookup_field = 'pk'
 
     def users_update(self, serializer):
@@ -329,3 +318,33 @@ class StudentRemarkCreateView(generics.ListCreateAPIView):
             error_message = {'message': 'Remark creation failed😒😒'}
             response.data = error_message
             return response
+
+
+class PaymentSuccessView(generics.ListCreateAPIView):
+    serializer_class = PaymentSuccessSerializer
+    queryset = PaymentSuccess.objects.all()
+    # permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        
+        # Check if the creation was successful
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({'message': 'Payement Successfull'}, status=status.HTTP_201_CREATED)
+        else:
+            # Creation failed, customize the error message
+            error_message = {'message': 'Payment failed😒😒'}
+            response.data = error_message
+            return response
+        
+
+
+class DeleteAccountView(generics.DestroyAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    lookup_field = 'pk'
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.delete()
+        return Response({"detail": "Account deleted successfully."}, status=status.HTTP_204_NO_CONTENT)

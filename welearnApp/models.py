@@ -139,7 +139,7 @@ class Class(models.Model):
         ('SIX MONTHS', 'SIX MONTHS'),
         ('ONE YEAR ABOVE', 'ONE YEAR ABOVE'),
     )
-    durtion = models.CharField(max_length=255, blank=True, null=True, choices=DURATION)
+    duration = models.CharField(max_length=255, blank=True, null=True, choices=DURATION)
     price = models.CharField(max_length=255, blank=True, null=True)
     def __str__(self):
         return self.class_name
@@ -201,6 +201,16 @@ class Booking(models.Model):
 
     def __str__(self):
         return self.class_booked.class_name
+
+
+class PaymentSuccess(models.Model):
+    # student = 
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='isPayed')
+    isPaymentSuccessful = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Payment successful for booking: {self.isPaymentSuccessful}'
 
 # ==================== PASSWORD FORGET AND RESET =====================
 
