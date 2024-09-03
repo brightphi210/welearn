@@ -98,6 +98,7 @@ class StudentRemarkSerializer(serializers.ModelSerializer):
 
 
 class PaymentSuccessSerializer(serializers.ModelSerializer):
+    student = serializers.CharField(source='booking.student.user.name', read_only=True)
     class Meta:
         model = PaymentSuccess
         fields = '__all__'

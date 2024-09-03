@@ -204,10 +204,9 @@ class Booking(models.Model):
 
 
 class PaymentSuccess(models.Model):
-    # student = 
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='isPayed')
     isPaymentSuccessful = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
         return f'Payment successful for booking: {self.isPaymentSuccessful}'
