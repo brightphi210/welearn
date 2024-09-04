@@ -48,33 +48,58 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 #         user.save()
 #         return user
 
-class UserSerializer(ModelSerializer):
+# class UserSerializer(ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ['id', 'name', 'email', 'password', 'user_type']
+#         depth = 1
+        
+#     def create(self, validated_data):
+#         password = validated_data.pop('password')
+#         user = User(**validated_data)
+#         user.set_password(password)
+#         user.save()  # Save will trigger OTP generation and email sending
+#         return user#
+
+
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True)
+    id = serializers.UUIDField(read_only=True,)
+    #  talentprofile = TalentProfileSerializer(read_only=True)
+     
+
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'password', 'user_type']
-        depth = 1
-        
+        fields = ('id',"name",'email','password',"user_type")
+
     def create(self, validated_data):
         password = validated_data.pop('password')
-        user = User(**validated_data)
+        user = User.objects.create(**validated_data)
         user.set_password(password)
-        user.save()  # Save will trigger OTP generation and email sending
+        user.save()
         return user
 
 # ==================== VERIFY USER SERIALIZER =======================
-class VerifyUserSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    otp = serializers.CharField(required=True)
+# class VerifyUserSerializer(serializers.Serializer):
+#     email = serializers.EmailField(required=True)
+#     otp = serializers.CharField(required=True)
 
-    def validate(self, attrs):
-        email = attrs['email']
-        otp = attrs['otp']
-        user = User.objects.filter(email=email).first()
-        if not user:
-            raise serializers.ValidationError('Invalid email address')
-        if user.is_active or user.otp != otp:
-            raise serializers.ValidationError('Invalid OTP code')
-        return attrs
+#     def validate(self, attrs):
+#         email = attrs['email']
+#         otp = attrs['otp']
+#         user = User.objects.filter(email=email).first()
+#         if not user:
+#             raise serializers.ValidationError('Invalid email address')
+#         if user.is_active or user.otp != otp:
+#             raise serializers.ValidationError('Invalid OTP code')
+#         return attrs
+    
+
+class VerifyUserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ('email','otp',)
 
     
 

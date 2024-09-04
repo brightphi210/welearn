@@ -3,6 +3,7 @@ from django.contrib.auth.models import UserManager, AbstractBaseUser, Permission
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+import random
 
 from django.conf import settings
 # Create your models here.
@@ -25,11 +26,34 @@ class CustomUserManager(UserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self._create_user(email, password, **extra_fields)
+
+
+
+# from django.contrib.auth.models import BaseUserManager
+
+# class UserManager(BaseUserManager):
+#     def create_user(self,email,password=None,**extra_fields):
+#        if not (email):
+#            raise ValueError('User must have an email address')
+       
+#        email = self.normalize_email(email)
+#        user = self.model(email=self.normalize_email(email),**extra_fields)
+       
+#        user.set_password(password)
+#        user.is_active = True
+#        user.save(using=self.db)
+#        return user
+        
+
+#     def create_superuser(self, email,password=None,**extra_fields):
+#         user = self.create_user(email,password,**extra_fields)
+#         user.is_admin=True
+        
+#         user.save(using=self.db)
+#         return user
     
 
 
-
-import random
 
 
 # ======================== Creatives =============================
@@ -43,7 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(null=True, blank=True)
-
+    otp_secret = models.CharField(max_length=500, null=True, blank=True)
     otp = models.CharField(max_length=6, blank=True)
 
 
@@ -71,15 +95,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if not self.pk:  # Only generate OTP for new users
-            self.generate_otp()  # Generate unique OTP before saving
-            count_id = User.objects.all().count()
-            self.auto_id = count_id + 1
-        super(User, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.pk:  # Only generate OTP for new users
+    #         self.generate_otp()  # Generate unique OTP before saving
+    #         count_id = User.objects.all().count()
+    #         self.auto_id = count_id + 1
+    #     super(User, self).save(*args, **kwargs)
 
-    def generate_otp(self):
-        self.otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])  # Generate a 6-digit OTP
+    # def generate_otp(self):
+    #     self.otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])  # Generate a 6-digit OTP
 
 
     def _str_(self):

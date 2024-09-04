@@ -41,6 +41,7 @@ def update_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def send_email_confirmation(sender, instance, created, **kwargs):
     if created:
+        print("called")
         subject = 'Account Activation OTP'
         message = f'Your OTP code is: {instance.otp}'
         from_email = settings.EMAIL_HOST_USER
