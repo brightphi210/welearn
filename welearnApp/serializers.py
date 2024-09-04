@@ -4,13 +4,6 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
-import random
-
-def generate_otp():
-    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])  # 6-digit OTP
-    return otp
-
-
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     @classmethod
@@ -39,22 +32,34 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 # ================ CREATING OF USER ===================
-class UserSerializer(ModelSerializer):
+# class UserSerializer(ModelSerializer):
     
+#     class Meta:
+#         model = User
+#         fields = ['id', 'name', 'email', 'password', 'user_type']
+#         depth = 1
+        
+
+#     def create(self, validated_data):
+#         password = validated_data.pop('password')
+#         user = User(**validated_data)
+#         user.otp = generate_otp()  
+#         user.set_password(password)
+#         user.save()
+#         return user
+
+class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'password', 'user_type']
         depth = 1
         
-
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = User(**validated_data)
-        user.otp = generate_otp()  
         user.set_password(password)
-        user.save()
+        user.save()  # Save will trigger OTP generation and email sending
         return user
-    
 
 # ==================== VERIFY USER SERIALIZER =======================
 class VerifyUserSerializer(serializers.Serializer):
@@ -98,7 +103,6 @@ class StudentRemarkSerializer(serializers.ModelSerializer):
 
 
 class PaymentSuccessSerializer(serializers.ModelSerializer):
-    student = serializers.CharField(source='booking.student.user.name', read_only=True)
     class Meta:
         model = PaymentSuccess
         fields = '__all__'

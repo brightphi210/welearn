@@ -47,3 +47,6 @@ def send_email_confirmation(sender, instance, created, **kwargs):
         recipient_list = [instance.email]   
         
         send_mail(subject, message, from_email, recipient_list)
+
+
+        

@@ -29,6 +29,7 @@ class CustomUserManager(UserManager):
 
 
 
+import random
 
 
 # ======================== Creatives =============================
@@ -71,9 +72,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.name
 
     def save(self, *args, **kwargs):
-        count_id = User.objects.all().count()
-        self.auto_id = count_id+1
+        if not self.pk:  # Only generate OTP for new users
+            self.generate_otp()  # Generate unique OTP before saving
+            count_id = User.objects.all().count()
+            self.auto_id = count_id + 1
         super(User, self).save(*args, **kwargs)
+
+    def generate_otp(self):
+        self.otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])  # Generate a 6-digit OTP
+
 
     def _str_(self):
         return self.name
