@@ -127,7 +127,6 @@ class BookingSerializerGet(serializers.ModelSerializer):
 
 # ================ INSTRUCTIOR ======================
 class InstructorSerializer(ModelSerializer):
-    
     classes = ClassSerializer(many=True)
     instructorRemark = InstructorRemarkSerializer(many=True)
     allBookings = BookingSerializerGet(many=True)
@@ -140,8 +139,6 @@ class InstructorSerializer(ModelSerializer):
 
 # ===================== STUDENT ========================
 class StudentSerializer(ModelSerializer):
-
-    
     hiredInstructors = BookingSerializerGet(many=True)
     studentRemark = StudentRemarkSerializer(many=True)
     
