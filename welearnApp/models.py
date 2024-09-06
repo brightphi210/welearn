@@ -67,13 +67,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(null=True, blank=True)
-    otp_secret = models.CharField(max_length=500, null=True, blank=True)
+    otp_secret = models.CharField(max_length=500, null=True,)
     otp = models.CharField(max_length=6, blank=True)
 
 
     USER_TYPE_CHOICES = (
         ('Instructor', 'Instructor'),
         ('Student', 'Student'),
+        ('Admin', 'Admin'),
     )
 
     user_type = models.CharField(max_length=255, choices=USER_TYPE_CHOICES, null=True, blank=True)
@@ -112,13 +113,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class InstructorProfile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    EXPERIENCE = (
-        ('One', '1-2'),
-        ('Two', '3-5'),
-        ('Three', '6 above'),
-    )
     occupation = models.CharField(max_length=255, blank=True, null=True)
-    years_of_experience = models.CharField(max_length=255, choices=EXPERIENCE, blank=True, null=True)
+    years_of_experience = models.CharField(max_length=255, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', default='profile_pics/default.png', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
@@ -127,6 +123,8 @@ class InstructorProfile(models.Model):
     gender = models.CharField(max_length=255, blank=True, null=True)
     dob = models.CharField(max_length=255, blank=True, null=True)
     bio_data = models.TextField(max_length=255, blank=True, null=True)
+    LGA = models.CharField(max_length=255, blank=True, null=True) 
+    state = models.CharField(max_length=255, blank=True, null=True)
 
 
     def __str__(self):
@@ -250,11 +248,18 @@ class PasswordReset(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class AdminSeeRemarks(models.Model):
+    admin = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f'Admin:'
+
 class InstructorRemark(models.Model):
     instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE, related_name='instructorRemark', blank=True, null=True)
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    admin_remark = models.ForeignKey(AdminSeeRemarks, related_name='instructorAdminRemark', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return f'Remark from {self.instructor.user.email} to {self.student.user.email}'
@@ -266,11 +271,14 @@ class StudentRemark(models.Model):
     instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    admin_remark = models.ForeignKey(AdminSeeRemarks, related_name='studentAdminRemark', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return f'Remark from {self.student.user.email} to {self.instructor.user.email}'
     
 
 
+
+    
 
 

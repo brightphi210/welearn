@@ -21,35 +21,35 @@ import pyotp
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
 
-#     def create(self, request, *args, **kwargs):
+    # def create(self, request, *args, **kwargs):
 
-#         # Check if a user with the given email already exists
-#         email = request.data.get('email', None)
-#         if email and User.objects.filter(email=email).exists():
+    #     # Check if a user with the given email already exists
+    #     email = request.data.get('email', None)
+    #     if email and User.objects.filter(email=email).exists():
 
-#             return Response(
-#                 {'message': 'User with this email already exists'}, 
-#                 status=400
-#             )
+    #         return Response(
+    #             {'message': 'User with this email already exists'}, 
+    #             status=400
+    #         )
 
-#         response = super().create(request, *args, **kwargs)
+    #     response = super().create(request, *args, **kwargs)
 
-#         # Check if the creation was successful
-#         if response.status_code == status.HTTP_201_CREATED:
-#             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
-#         else:
-#             # Registration failed, customize the error message
-#             error_message = {'message': 'User registration failed. Please check the provided data.'}
-#             response.data = error_message
-#             return response
+    #     # Check if the creation was successful
+    #     if response.status_code == status.HTTP_201_CREATED:
+    #         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+    #     else:
+    #         # Registration failed, customize the error message
+    #         error_message = {'message': 'User registration failed. Please check the provided data.'}
+    #         response.data = error_message
+    #         return response
 
 
 class UserGetCreate(generics.ListCreateAPIView):
-     serializer_class = UserSerializer
-     permission_classes = [permissions.AllowAny]
-     queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = User.objects.all()
 
-     def perform_create(self, serializer):
+    def perform_create(self, serializer):
         if serializer.is_valid():
             print("True")
             base32secret3232 = pyotp.random_base32()
@@ -57,11 +57,16 @@ class UserGetCreate(generics.ListCreateAPIView):
             time_otp = otp.now()
             user_type = serializer.validated_data.get('user_type')
             otp_secret = base32secret3232
-            user = serializer.save(
-                otp=time_otp, user_type=user_type, otp_secret=otp_secret)
+            user = serializer.save(otp=time_otp, user_type=user_type, otp_secret=otp_secret)
             user.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'User registration failed. Please check the provided data.'}, status=status.HTTP_400_BAD_REQUEST)
+     
 
 
 
@@ -398,3 +403,10 @@ class DeleteAccountView(generics.DestroyAPIView):
         user = self.get_object()
         user.delete()
         return Response({"detail": "Account deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class AdminSeeView(generics.ListAPIView):
+    serializer_class = AdminSeeRemarkSerializer
+    queryset = AdminSeeRemarks.objects.all()

@@ -48,36 +48,37 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 #         user.save()
 #         return user
 
-# class UserSerializer(ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['id', 'name', 'email', 'password', 'user_type']
-#         depth = 1
-        
-#     def create(self, validated_data):
-#         password = validated_data.pop('password')
-#         user = User(**validated_data)
-#         user.set_password(password)
-#         user.save()  # Save will trigger OTP generation and email sending
-#         return user#
-
-
-class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-    id = serializers.UUIDField(read_only=True,)
-    #  talentprofile = TalentProfileSerializer(read_only=True)
-     
-
+class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('id',"name",'email','password',"user_type")
-
+        fields = ['id', 'name', 'email', 'password', 'user_type']
+        depth = 1
+        
     def create(self, validated_data):
         password = validated_data.pop('password')
-        user = User.objects.create(**validated_data)
+        user = User(**validated_data)
         user.set_password(password)
         user.save()
         return user
+
+
+# class UserSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True, required=True)
+#     id = serializers.UUIDField(read_only=True,)
+#     talentprofile = TalentProfileSerializer(read_only=True)
+     
+
+#     class Meta:
+#         model = User
+#         fields = ['id', 'name', 'email', 'password', 'user_type']
+#         depth = 1  
+
+#     def create(self, validated_data):
+#         password = validated_data.pop('password')
+#         user = User.objects.create(**validated_data)
+#         user.set_password(password)
+#         user.save()
+#         return user
 
 # ==================== VERIFY USER SERIALIZER =======================
 # class VerifyUserSerializer(serializers.Serializer):
@@ -197,3 +198,12 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
     confirm_new_password = serializers.CharField(required=True)
     
+
+
+class AdminSeeRemarkSerializer(serializers.ModelSerializer):
+    instructorAdminRemark = InstructorRemarkSerializer(many=True)
+    studentAdminRemark = StudentRemarkSerializer(many=True)
+    
+    class Meta:
+        model = AdminSeeRemarks
+        fields = '__all__'

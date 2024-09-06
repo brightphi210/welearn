@@ -40,4 +40,5 @@ urlpatterns = [
 
 
     path('payment/', PaymentSuccessView.as_view(), name='payment'),
+    path('admin_see_remarks/', AdminSeeView.as_view(), name='admin-see-remarks'),
 ]
