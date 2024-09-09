@@ -71,50 +71,60 @@ class UserGetCreate(generics.ListCreateAPIView):
 
 
 # ============ ACCOUNT VERIFICATION VIA OTP =============
-# class ActivateAccountView(APIView):
-#     def post(self, request):
+
+
+# class ActivateAccountView(generics.GenericAPIView):
+#     permission_classes = [permissions.AllowAny]
+#     serializer_class = VerifyUserSerializer
+#     def post(self, request, *args, **kwargs):
 #         email = request.data.get('email')
 #         otp = request.data.get('otp')
-
+#         print(otp)
 #         try:
-#             user = User.objects.get(email=email)
-#             if user.otp == otp and not user.is_active:
-#                 user.is_active = True
-#                 user.otp = ''  # Clear OTP after successful activation
-#                 user.save()
-#                 return Response({'message': 'Account activated successfully!'})
-#             else:
-#                 return Response({'message': 'Invalid OTP or account already activated'}, status=400)
-#         except User.DoesNotExist:
-#             return Response({'message': 'User with this email not found'}, status=404)
-
+#             user = User.objects.get(email=email, otp=otp)
+#             print(user)
+#         except:
+#             data = {'message': "User Does not exists"}
+#             return Response(data=data, status=status.HTTP_404_NOT_FOUND)
+#         if  pyotp.TOTP(user.otp_secret, interval=1000, digits=6).verify(otp):
+#             user.is_active = True
+#             user.save()
+#             data = {
+#                 'user': user.email
+#             }
+#             return Response(data=data, status=status.HTTP_200_OK)
+#             # return redirect('http://localhost:8000/api/token')
+            
+#         else:
+#             data = {'message': "Token has Expired"}
+#             return Response(data=data, status=status.HTTP_404_NOT_FOUND)
+        
 
 class ActivateAccountView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = VerifyUserSerializer
+
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         otp = request.data.get('otp')
-        print(otp)
+
+        if not email or not otp:
+            return Response({'message': "Email and OTP are required."}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            user = User.objects.get(email=email, otp=otp)
-            print(user)
-        except:
-            data = {'message': "User Does not exists"}
-            return Response(data=data, status=status.HTTP_404_NOT_FOUND)
-        if  pyotp.TOTP(user.otp_secret, interval=1000, digits=6).verify(otp):
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'message': "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verify OTP using pyotp
+        if pyotp.TOTP(user.otp_secret, interval=1000, digits=6).verify(otp):
             user.is_active = True
             user.save()
-            data = {
-                'user': user.email
-            }
-            return Response(data=data, status=status.HTTP_200_OK)
-            # return redirect('http://localhost:8000/api/token')
-            
+            data = {'user': user.email}
+            return Response({'message': "OTP Verified."}, status=status.HTTP_200_OK)
         else:
-            data = {'message': "Token has Expired"}
-            return Response(data=data, status=status.HTTP_404_NOT_FOUND)
-        
+            return Response({'message': "Invalid or expired OTP."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 

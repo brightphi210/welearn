@@ -132,6 +132,7 @@ class PaymentSuccessSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentSuccess
         fields = '__all__'
+        depth = 2
 
 
 
