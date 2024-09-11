@@ -257,6 +257,7 @@ class AdminSeeRemarks(models.Model):
 class InstructorRemark(models.Model):
     instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE, related_name='instructorRemark', blank=True, null=True)
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, blank=True, null=True)
+    booked_clasd = models.ForeignKey(Booking, on_delete=models.CASCADE, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     admin_remark = models.ForeignKey(AdminSeeRemarks, related_name='instructorAdminRemark', on_delete=models.CASCADE, blank=True, null=True)
@@ -269,6 +270,7 @@ class InstructorRemark(models.Model):
 class StudentRemark(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='studentRemark', blank=True, null=True)
     instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE, blank=True, null=True)
+    booked_clasd = models.ForeignKey(Booking, on_delete=models.CASCADE, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     admin_remark = models.ForeignKey(AdminSeeRemarks, related_name='studentAdminRemark', on_delete=models.CASCADE, blank=True, null=True)

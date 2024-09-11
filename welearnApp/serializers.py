@@ -97,7 +97,6 @@ class UserSerializer(ModelSerializer):
     
 
 class VerifyUserSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = User
         fields = ('email','otp',)
