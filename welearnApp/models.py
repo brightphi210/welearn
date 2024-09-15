@@ -62,13 +62,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255, null=True, blank=True)
 
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(null=True, blank=True)
-    otp_secret = models.CharField(max_length=500, null=True,)
-    otp = models.CharField(max_length=6, blank=True)
+    # otp_secret = models.CharField(max_length=500, null=True,)
+    # otp = models.CharField(max_length=6, blank=True)
 
 
     USER_TYPE_CHOICES = (

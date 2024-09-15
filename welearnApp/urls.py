@@ -8,7 +8,7 @@ urlpatterns = [
     path('user/update/<str:pk>/',UserGetUpdateDelete.as_view(), name='user'),
 
     # ================= ACCOUNT OTP ========================
-    path('account-otp/', ActivateAccountView.as_view(), name='otp'),
+    # path('account-otp/', ActivateAccountView.as_view(), name='otp'),
 
     # ================= PROFILES ========================
     path('instructor-profiles/', InstructorProfileGet.as_view(), name='instructor'),

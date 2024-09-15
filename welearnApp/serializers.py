@@ -96,10 +96,10 @@ class UserSerializer(ModelSerializer):
 #         return attrs
     
 
-class VerifyUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('email','otp',)
+# class VerifyUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('email','otp',)
 
     
 

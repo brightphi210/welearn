@@ -2,7 +2,6 @@ from django.shortcuts import render
 from rest_framework import generics, status,permissions
 # from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import APIView
-from .serializers import VerifyUserSerializer
 from .models import User
 from rest_framework.response import Response
 from .serializers import *
@@ -17,61 +16,44 @@ import pyotp
 
 
 # # ================= USER CREATE ========================
-# class UserGetCreate(generics.ListCreateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-
-    # def create(self, request, *args, **kwargs):
-
-    #     # Check if a user with the given email already exists
-    #     email = request.data.get('email', None)
-    #     if email and User.objects.filter(email=email).exists():
-
-    #         return Response(
-    #             {'message': 'User with this email already exists'}, 
-    #             status=400
-    #         )
-
-    #     response = super().create(request, *args, **kwargs)
-
-    #     # Check if the creation was successful
-    #     if response.status_code == status.HTTP_201_CREATED:
-    #         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
-    #     else:
-    #         # Registration failed, customize the error message
-    #         error_message = {'message': 'User registration failed. Please check the provided data.'}
-    #         response.data = error_message
-    #         return response
-
-
 class UserGetCreate(generics.ListCreateAPIView):
-    serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny]
     queryset = User.objects.all()
+    serializer_class = UserSerializer
 
-    def perform_create(self, serializer):
-        if serializer.is_valid():
-            print("True")
-            base32secret3232 = pyotp.random_base32()
-            otp = pyotp.TOTP(base32secret3232, interval=1000, digits=6)
-            time_otp = otp.now()
-            user_type = serializer.validated_data.get('user_type')
-            otp_secret = base32secret3232
-            user = serializer.save(otp=time_otp, user_type=user_type, otp_secret=otp_secret)
-            user.save()
-    
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
+        email = request.data.get('email', None)
+        if email and User.objects.filter(email=email).exists():
+
+            return Response(
+                {'message': 'User with this email already exists'}, 
+                status=400
+            )
+        response = super().create(request, *args, **kwargs)
+
+        if response.status_code == status.HTTP_201_CREATED:
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
-        return Response({'message': 'User registration failed. Please check the provided data.'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            error_message = {'message': 'User registration failed. Please check the provided data.'}
+            response.data = error_message
+            return response
+
+
+# class UserGetCreate(generics.ListCreateAPIView):
+#     serializer_class = UserSerializer
+#     permission_classes = [permissions.AllowAny]
+#     queryset = User.objects.all()
+    
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         if serializer.is_valid():
+#             self.perform_create(serializer)
+#             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+#         return Response({'message': 'User registration failed. Please check the provided data.'}, status=status.HTTP_400_BAD_REQUEST)
      
 
 
 
 # ============ ACCOUNT VERIFICATION VIA OTP =============
-
 
 # class ActivateAccountView(generics.GenericAPIView):
 #     permission_classes = [permissions.AllowAny]
@@ -100,30 +82,30 @@ class UserGetCreate(generics.ListCreateAPIView):
 #             return Response(data=data, status=status.HTTP_404_NOT_FOUND)
         
 
-class ActivateAccountView(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny]
-    serializer_class = VerifyUserSerializer
+# class ActivateAccountView(generics.GenericAPIView):
+#     permission_classes = [permissions.AllowAny]
+#     serializer_class = VerifyUserSerializer
 
-    def post(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        otp = request.data.get('otp')
+#     def post(self, request, *args, **kwargs):
+#         email = request.data.get('email')
+#         otp = request.data.get('otp')
 
-        if not email or not otp:
-            return Response({'message': "Email and OTP are required."}, status=status.HTTP_400_BAD_REQUEST)
+#         if not email or not otp:
+#             return Response({'message': "Email and OTP are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({'message': "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
+#         try:
+#             user = User.objects.get(email=email)
+#         except User.DoesNotExist:
+#             return Response({'message': "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Verify OTP using pyotp
-        if pyotp.TOTP(user.otp_secret, interval=1000, digits=6).verify(otp):
-            user.is_active = True
-            user.save()
-            data = {'user': user.email}
-            return Response({'message': "OTP Verified."}, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': "Invalid or expired OTP."}, status=status.HTTP_400_BAD_REQUEST)
+#         # Verify OTP using pyotp
+#         if pyotp.TOTP(user.otp_secret, interval=1000, digits=6).verify(otp):
+#             user.is_active = True
+#             user.save()
+#             data = {'user': user.email}
+#             return Response({'message': "OTP Verified."}, status=status.HTTP_200_OK)
+#         else:
+#             return Response({'message': "Invalid or expired OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -140,8 +122,6 @@ class InstructorProfileGet(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = InstructorProfile.objects.all()
     serializer_class = InstructorSerializer
-
-
 
 
 # =============GET UPDATE, DELETE INSTRUCTORS PROFILE ===========

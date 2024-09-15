@@ -42,8 +42,8 @@ def update_profile(sender, instance, created, **kwargs):
 def send_email_confirmation(sender, instance, created, **kwargs):
     if created:
         print("called")
-        subject = 'Account Activation OTP'
-        message = f'Your OTP code is: {instance.otp}'
+        subject = 'Your Account has been created successfully'
+        message = 'Welcome to Welearn Global click the link to very your mail https://www.welearnglobal.org/'
         from_email = settings.EMAIL_HOST_USER
         recipient_list = [instance.email]   
         
