@@ -207,3 +207,12 @@ class AdminSeeRemarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminSeeRemarks
         fields = '__all__'
+
+
+class DeleteUserByEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("No user with this email address found.")
+        return value

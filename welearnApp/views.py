@@ -384,16 +384,35 @@ class PaymentSuccessView(generics.ListCreateAPIView):
         
 
 
+# class DeleteAccountView(generics.DestroyAPIView):
+#     serializer_class = UserSerializer
+#     queryset = User.objects.all()
+#     lookup_field = 'pk'
+
+#     def delete(self, request, *args, **kwargs):
+#         user = self.get_object()
+#         user.delete()
+#         return Response({"detail": "Account deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+
+
 class DeleteAccountView(generics.DestroyAPIView):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    lookup_field = 'pk'
+    serializer_class = DeleteUserByEmailSerializer
+
+    def get_object(self):
+        # Get the user by email from the request data
+        email = self.request.data.get('email')
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            return None
 
     def delete(self, request, *args, **kwargs):
         user = self.get_object()
-        user.delete()
-        return Response({"detail": "Account deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-
+        if user:
+            user.delete()
+            return Response({"detail": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 
